@@ -1,3 +1,4 @@
+from pipelines import reddit_pipeline
 from airflow import DAG
 from airflow.operators.python import PythonOperator
 from datetime import datetime
@@ -31,5 +32,6 @@ extract = PythonOperator(
             "subreddit": "data_engineering",
             "time_filter": "day",
             "limit": 100
-        }
+        },
+        dag=dag
 )
