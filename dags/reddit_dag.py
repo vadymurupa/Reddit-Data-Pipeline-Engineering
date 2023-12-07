@@ -1,4 +1,4 @@
-from pipelines import reddit_pipeline
+from pipelines import reddit_pipeline, upload_s3_pipeline
 from airflow import DAG
 from airflow.operators.python import PythonOperator
 from datetime import datetime
@@ -34,4 +34,10 @@ extract = PythonOperator(
             "limit": 100
         },
         dag=dag
+)
+
+upload_s3 = PythonOperator(
+    task_id = "s3_upload",
+    python_callable= upload_s3_pipeline,
+    dag=dag
 )
