@@ -41,3 +41,5 @@ upload_s3 = PythonOperator(
     python_callable= upload_s3_pipeline,
     dag=dag
 )
+
+extract >> upload_s3() 

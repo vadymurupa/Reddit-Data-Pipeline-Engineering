@@ -12,7 +12,6 @@ import argparse
 import os
 import shutil
 import site
-import subprocess
 import sys
 
 import argcomplete
@@ -30,22 +29,15 @@ source "{activator}"
 """
 
 
-def get_local_dir():
-    try:
-        return subprocess.check_output(["brew", "--prefix"]).decode().strip()
-    except (FileNotFoundError, subprocess.CalledProcessError):
-        return "/usr/local"
-
-
 def get_zsh_system_dir():
-    return f"{get_local_dir()}/share/zsh/site-functions"
+    return "/usr/local/share/zsh/site-functions"
 
 
 def get_bash_system_dir():
     if "BASH_COMPLETION_COMPAT_DIR" in os.environ:
         return os.environ["BASH_COMPLETION_COMPAT_DIR"]
     elif sys.platform == "darwin":
-        return f"{get_local_dir()}/etc/bash_completion.d"  # created by homebrew
+        return "/usr/local/etc/bash_completion.d"  # created by homebrew
     else:
         return "/etc/bash_completion.d"  # created by bash-completion
 
@@ -96,9 +88,7 @@ def append_to_config_file(path, shellcode):
         print(f"argcomplete needs to append to the file {path}. The following code will be appended:", file=sys.stderr)
         for line in shellcode.splitlines():
             print(">", line, file=sys.stderr)
-        if not get_consent():
-            print("Not added.", file=sys.stderr)
-            return
+        get_consent()
     print(f"Adding shellcode to {path}...", file=sys.stderr)
     with open(path, "a") as fh:
         fh.write(shellcode)
@@ -127,7 +117,8 @@ if args.dest:
     destinations.append(args.dest)
 elif site.ENABLE_USER_SITE and site.USER_SITE in argcomplete.__file__:
     print(
-        "Argcomplete was installed in the user site local directory. Defaulting to user installation.", file=sys.stderr
+        "Argcomplete was installed in the user site local directory. Defaulting to user installation.",
+        file=sys.stderr
     )
     link_user_rcfiles()
 elif sys.prefix != sys.base_prefix:
